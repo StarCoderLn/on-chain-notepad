@@ -1,0 +1,397 @@
+<title>链上记事本 — 系统架构</title>
+<style>
+  :root {
+    --bg: #0d1120;
+    --panel: #111627;
+    --panel-2: #151b2d;
+    --panel-3: #171d30;
+    --ink: #e9eaf2;
+    --muted: #8992aa;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-dim: rgba(255, 255, 255, 0.07);
+    --accent: #d6ff7f;
+    --accent-dim: rgba(214, 255, 127, 0.4);
+    --local-line: rgba(180, 188, 210, 0.55);
+
+    --font-display: Georgia, "Songti SC", "Noto Serif SC", "Iowan Old Style", serif;
+    --font-mono: ui-monospace, "SF Mono", "DM Mono", Menlo, Consolas, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI",
+      sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 64px 32px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  header.head {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .dek {
+    margin: 0;
+    max-width: 640px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .diagram-frame {
+    overflow-x: auto;
+    border: 1px solid var(--border-dim);
+    border-radius: 16px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+    padding: 28px clamp(12px, 3vw, 32px);
+  }
+
+  svg.diagram {
+    display: block;
+    width: 100%;
+    max-width: 1120px;
+    height: auto;
+    margin: 0 auto;
+    color: var(--ink);
+  }
+
+  .box-fill {
+    fill: var(--panel-2);
+  }
+  .box-fill-hub {
+    fill: var(--panel-3);
+  }
+  .box-fill-local {
+    fill: var(--panel);
+  }
+  .box-stroke {
+    stroke: var(--border);
+    stroke-width: 1;
+  }
+  .box-stroke-hub {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+  }
+  .box-stroke-local {
+    stroke: var(--local-line);
+    stroke-width: 1.3;
+    stroke-dasharray: 5 4;
+  }
+
+  .box-title {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 14px;
+    fill: var(--ink);
+  }
+  .box-title-hub {
+    fill: var(--accent);
+  }
+  .box-detail {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--muted);
+  }
+  .box-detail-cn {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    fill: var(--muted);
+  }
+  .box-detail-dim {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--muted);
+    opacity: 0.75;
+  }
+  .box-detail-dim-cn {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    fill: var(--muted);
+    opacity: 0.8;
+  }
+
+  .flow-line {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.4;
+    opacity: 0.9;
+    marker-start: url(#arrow);
+    marker-end: url(#arrow);
+  }
+  .flow-line-one {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.4;
+    opacity: 0.9;
+    marker-end: url(#arrow);
+  }
+  .flow-line-local {
+    fill: none;
+    stroke: var(--local-line);
+    stroke-width: 1.3;
+    stroke-dasharray: 5 4;
+    marker-end: url(#arrow);
+  }
+  marker path {
+    fill: var(--muted);
+  }
+  marker.local path {
+    fill: var(--local-line);
+  }
+
+  .flow-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--muted);
+  }
+  .flow-label-cn {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    fill: var(--muted);
+  }
+  .flow-label-local {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    fill: var(--local-line);
+  }
+
+  .row-label {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    fill: var(--muted);
+    opacity: 0.75;
+  }
+
+  figcaption {
+    max-width: 720px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  figcaption strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .spec {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--border-dim);
+    border-radius: 9px;
+    background: var(--panel);
+    font-size: 12px;
+  }
+
+  .spec .k {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  .spec .v {
+    font-family: var(--font-mono);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .diagram-frame {
+      animation: fade-in 0.5s ease-out both;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="page">
+  <header class="head">
+    <p class="eyebrow">系统架构</p>
+    <h1>链上记事本</h1>
+    <p class="dek">
+      一个没有数据库的记事本应用：每一篇笔记都存在 Sepolia 链上，每一次保存都是一笔签名交易，前端本身只是一个链完全不知道存在的静态文件。
+    </p>
+  </header>
+
+  <figure>
+    <div class="diagram-frame">
+      <svg
+        class="diagram"
+        viewBox="0 0 1120 480"
+        role="img"
+        aria-label="架构图：浏览器应用连接钱包，并通过 Infura 的 Sepolia RPC 节点转发读取和签名交易，最终到达 Sepolia 链上的 OnChainNotepad 合约。浏览器同时把交易记录缓存在 localStorage 里，只属于这一个浏览器。另一条独立的线路是：推送到 GitHub 仓库会触发 Cloudflare Pages 自动构建，把静态站点重新发布回浏览器。"
+      >
+        <defs>
+          <marker
+            id="arrow"
+            viewBox="0 0 10 10"
+            refX="8.5"
+            refY="5"
+            markerWidth="6.5"
+            markerHeight="6.5"
+            orient="auto-start-reverse"
+          >
+            <path d="M0,0 L10,5 L0,10 Z"></path>
+          </marker>
+        </defs>
+
+        <!-- 方框最先画，箭头和文字标签后画，才能保证文字始终盖在方框上面不被挡住 -->
+        <rect x="40" y="40" width="150" height="90" rx="10" class="box-fill box-stroke"></rect>
+        <rect
+          x="285"
+          y="40"
+          width="230"
+          height="90"
+          rx="10"
+          class="box-fill box-stroke"
+        ></rect>
+        <rect x="600" y="40" width="185" height="90" rx="10" class="box-fill box-stroke"></rect>
+        <rect x="850" y="40" width="230" height="90" rx="10" class="box-fill box-stroke"></rect>
+
+        <rect
+          x="300"
+          y="190"
+          width="200"
+          height="90"
+          rx="10"
+          class="box-fill-local box-stroke-local"
+        ></rect>
+
+        <rect x="40" y="350" width="170" height="90" rx="10" class="box-fill box-stroke"></rect>
+        <rect x="320" y="350" width="220" height="90" rx="10" class="box-fill box-stroke"></rect>
+        <rect x="650" y="350" width="220" height="90" rx="10" class="box-fill box-stroke"></rect>
+
+        <!-- 连线 -->
+        <line x1="190" y1="85" x2="285" y2="85" class="flow-line"></line>
+        <line x1="515" y1="85" x2="600" y2="85" class="flow-line"></line>
+        <line x1="785" y1="85" x2="850" y2="85" class="flow-line"></line>
+        <line x1="400" y1="130" x2="400" y2="190" class="flow-line-local"></line>
+        <path d="M 760 350 C 760 220 650 140 515 95" class="flow-line-one"></path>
+        <line x1="210" y1="395" x2="320" y2="395" class="flow-line-one"></line>
+        <line x1="540" y1="395" x2="650" y2="395" class="flow-line-one"></line>
+
+        <!-- 标签统一最后画，永远盖在方框和连线上面 -->
+        <text x="40" y="24" class="row-label">运行时 — 读写笔记</text>
+        <text x="40" y="334" class="row-label">部署 — 发布前端</text>
+
+        <text x="238" y="72" class="flow-label-cn" text-anchor="middle">连接 · 签名交易</text>
+        <text x="558" y="72" class="flow-label-cn" text-anchor="middle">读取 / 发送交易</text>
+        <text x="818" y="72" class="flow-label" text-anchor="middle">JSON-RPC</text>
+        <text x="415" y="153" class="flow-label-local">缓存交易记录</text>
+        <text x="415" y="167" class="flow-label-local">（仅本地）</text>
+        <text x="695" y="228" class="flow-label-cn" text-anchor="start">每次推送后</text>
+        <text x="695" y="243" class="flow-label-cn" text-anchor="start">通过 HTTPS 发布 dist/</text>
+        <text x="265" y="382" class="flow-label" text-anchor="middle">git push main</text>
+        <text x="595" y="382" class="flow-label-cn" text-anchor="middle">webhook → 构建</text>
+
+        <text x="115" y="78" text-anchor="middle" class="box-title">钱包</text>
+        <text x="115" y="100" text-anchor="middle" class="box-detail">MetaMask · Sepolia</text>
+
+        <text x="400" y="70" text-anchor="middle" class="box-title">
+          浏览器 — React 单页应用
+        </text>
+        <text x="400" y="90" text-anchor="middle" class="box-detail">wagmi + RainbowKit</text>
+        <text x="400" y="108" text-anchor="middle" class="box-detail-dim">src/App.tsx</text>
+
+        <text x="693" y="78" text-anchor="middle" class="box-title">Infura RPC 节点</text>
+        <text x="693" y="100" text-anchor="middle" class="box-detail">sepolia.infura.io/v3/…</text>
+
+        <text x="965" y="70" text-anchor="middle" class="box-title">OnChainNotepad.sol</text>
+        <text x="965" y="90" text-anchor="middle" class="box-detail">Sepolia · 0xa66D…5D43</text>
+        <text x="965" y="108" text-anchor="middle" class="box-detail-dim-cn">
+          已通过 Hardhat 部署并验证
+        </text>
+
+        <text x="400" y="222" text-anchor="middle" class="box-title">浏览器 localStorage</text>
+        <text x="400" y="242" text-anchor="middle" class="box-detail-cn">按地址缓存交易记录</text>
+        <text x="400" y="260" text-anchor="middle" class="box-detail-dim-cn">
+          按设备/域名隔离，不会同步
+        </text>
+
+        <text x="125" y="388" text-anchor="middle" class="box-title">开发者</text>
+        <text x="125" y="410" text-anchor="middle" class="box-detail-cn">本地机器</text>
+
+        <text x="430" y="388" text-anchor="middle" class="box-title">GitHub</text>
+        <text x="430" y="410" text-anchor="middle" class="box-detail">
+          StarCoderLn/on-chain-notepad
+        </text>
+
+        <text x="760" y="382" text-anchor="middle" class="box-title">Cloudflare Pages</text>
+        <text x="760" y="402" text-anchor="middle" class="box-detail">pnpm build → dist/</text>
+        <text x="760" y="420" text-anchor="middle" class="box-detail-dim">
+          on-chain-notepad.pages.dev
+        </text>
+      </svg>
+    </div>
+    <figcaption>
+      笔记从不经过任何服务器数据库——<strong>每一次读写都直接从浏览器经 Infura 发送到 Sepolia 链上的
+      OnChainNotepad 合约</strong>，由用户连接的钱包签名。唯一不在链上的部分，是每篇笔记详情页里的"链上记录"列表：它缓存在
+      <strong>localStorage</strong> 里，只属于当前这一个浏览器，换一台设备打开同一篇笔记是看不到的。运行时流程之下，部署链路简单得多：推送到
+      <strong>main</strong> 分支会触发 Cloudflare Pages 自动构建，把静态站点重新发布给浏览器——全程没有服务器，也不需要后端。
+    </figcaption>
+  </figure>
+
+  <div class="specs">
+    <div class="spec"><span class="k">合约</span><span class="v">0xa66D…5D43</span></div>
+    <div class="spec"><span class="k">网络</span><span class="v">Sepolia · 11155111</span></div>
+    <div class="spec"><span class="k">线上地址</span><span class="v">on-chain-notepad.pages.dev</span></div>
+    <div class="spec"><span class="k">技术栈</span><span class="v">Vite · React · wagmi · Tailwind</span></div>
+  </div>
+</div>
