@@ -13,16 +13,9 @@ const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'demo-project
 // RainbowKit + wagmi 的钱包连接配置，仅启用 Sepolia 测试网
 const config = getDefaultConfig({ appName: 'Noteblock', projectId, chains: [sepolia], ssr: false })
 
-// 钱包连接弹窗中使用的自定义头像（用字母 N 代替默认头像图标）
+// 钱包连接弹窗中使用的自定义头像：直接用 Noteblock 的品牌 logo
 function NoteblockAvatar({ size }: { size: number }) {
-  return (
-    <span
-      className="grid place-items-center rounded-full bg-accent font-display font-bold leading-none text-accent-fg"
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
-    >
-      N
-    </span>
-  )
+  return <img src="/noteblock-mark.svg" alt="Noteblock" style={{ width: size, height: size }} />
 }
 
 // 应用入口：依次包裹 wagmi（钱包状态）、react-query（数据请求缓存）、RainbowKit（连接钱包 UI）
