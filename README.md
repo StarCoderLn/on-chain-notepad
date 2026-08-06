@@ -4,6 +4,10 @@
 
 系统架构图：[中文版](https://claude.ai/code/artifact/6549c0f0-775a-4715-8a97-ffe7eed27941) · [English](https://claude.ai/code/artifact/98c559a7-5a05-4cb3-9af5-1de740309583)
 
+线上访问：[on-chain-notepad.pages.dev](https://on-chain-notepad.pages.dev)
+
+合约地址：[`0xa66D0f8150b862Db4e51BE4671615CBb55475D43`](https://sepolia.etherscan.io/address/0xa66D0f8150b862Db4e51BE4671615CBb55475D43#code)（Sepolia，已开源验证）
+
 ## 快速开始
 
 ```bash
