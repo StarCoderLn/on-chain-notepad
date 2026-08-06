@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+@import 'tailwindcss';
+
+/* 设计令牌：颜色 / 字体 / 动画时长，供全局 Tailwind 工具类使用（如 bg-accent、font-display） */
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-display: 'Playfair Display', serif;
+
+  --color-accent: #d6ff7f;
+  --color-accent-hover: #e1ff9e;
+  --color-accent-fg: #172019;
+
+  --color-bg: #0d1120;
+  --color-panel: #111627;
+  --color-panel-2: #151b2d;
+  --color-panel-3: #171d30;
+  --color-ink: #e9eaf2;
+
+  --animate-spin: spin 0.9s linear infinite;
+}
+
+/* 少量跨组件共用的元素级默认样式，其余样式全部走 Tailwind 工具类 */
+@layer base {
+  body {
+    @apply m-0 min-w-[320px] bg-bg font-sans text-ink;
+    font-synthesis: none;
+  }
+  button {
+    @apply cursor-pointer border-0 bg-transparent p-0;
+  }
+  button:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+}
