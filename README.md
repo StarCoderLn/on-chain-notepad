@@ -2,7 +2,7 @@
 
 一个使用 React、wagmi、RainbowKit 与 Solidity 编写的 Sepolia 链上记事本。笔记正文直接保存到合约中，可新建、编辑、归档和按内容检索。
 
-系统架构图：[中文版](docs/architecture.zh.html) · [English](docs/architecture.html)（下载后用浏览器打开，或直接看在线版：[中文](https://claude.ai/code/artifact/6549c0f0-775a-4715-8a97-ffe7eed27941) · [English](https://claude.ai/code/artifact/98c559a7-5a05-4cb3-9af5-1de740309583)）
+系统架构图：[中文版](https://claude.ai/code/artifact/6549c0f0-775a-4715-8a97-ffe7eed27941) · [English](https://claude.ai/code/artifact/98c559a7-5a05-4cb3-9af5-1de740309583)
 
 ## 快速开始
 
