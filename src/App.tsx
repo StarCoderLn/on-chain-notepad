@@ -137,6 +137,7 @@ export default function App() {
   // 打开编辑面板：传入笔记则编辑该笔记，不传则新建一篇空白笔记
   const openEditor = (note?: Note) => {
     setSelected(null)
+    setMenuOpen(false) // 从移动端抽屉里点击"新建笔记"时，顺手收起抽屉
     setEditor(note ? { id: note.id, title: note.title, content: note.content } : emptyEditor())
   }
 
@@ -155,6 +156,13 @@ export default function App() {
 
   return (
     <main className="flex min-h-screen bg-bg">
+      {/* 移动端侧边栏展开时的遮罩层，点击可关闭侧边栏 */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-[15] hidden bg-black/50 max-[850px]:block"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
       {/* 左侧边栏：品牌标识 + 新建笔记入口 + 筛选导航（移动端可收起） */}
       <aside
         className={`flex min-h-screen w-[260px] flex-none flex-col border-r border-white/[0.07] bg-panel p-[26px_16px_16px] max-[850px]:fixed max-[850px]:z-20 max-[850px]:transition-transform max-[850px]:duration-200 ${
@@ -175,7 +183,7 @@ export default function App() {
           </button>
         </div>
         <button
-          className="mt-[30px] mb-[27px] flex h-[44px] items-center justify-center gap-[8px] rounded-[10px] bg-accent px-[16px] font-bold text-accent-fg transition-transform hover:-translate-y-px hover:bg-accent-hover"
+          className="mt-[30px] mb-[27px] flex h-[44px] items-center justify-center gap-[8px] whitespace-nowrap rounded-[10px] bg-accent px-[16px] font-bold text-accent-fg transition-transform hover:-translate-y-px hover:bg-accent-hover"
           onClick={() => openEditor()}
           disabled={!isConnected || !isContractConfigured}
         >
@@ -190,7 +198,7 @@ export default function App() {
             你的空间
           </p>
           <button
-            className={`flex h-[42px] w-full items-center gap-[11px] rounded-[8px] px-[10px] text-left text-[14px] text-[#aeb4c8] hover:bg-[#1b2134] hover:text-[#e4e7f0] ${
+            className={`flex h-[42px] w-full items-center gap-[11px] whitespace-nowrap rounded-[8px] px-[10px] text-left text-[14px] text-[#aeb4c8] hover:bg-[#1b2134] hover:text-[#e4e7f0] ${
               filter === 'all' ? 'bg-[#20283e] text-white' : ''
             }`}
             onClick={() => setFilter('all')}
@@ -202,7 +210,7 @@ export default function App() {
             </em>
           </button>
           <button
-            className={`flex h-[42px] w-full items-center gap-[11px] rounded-[8px] px-[10px] text-left text-[14px] text-[#aeb4c8] hover:bg-[#1b2134] hover:text-[#e4e7f0] ${
+            className={`flex h-[42px] w-full items-center gap-[11px] whitespace-nowrap rounded-[8px] px-[10px] text-left text-[14px] text-[#aeb4c8] hover:bg-[#1b2134] hover:text-[#e4e7f0] ${
               filter === 'active' ? 'bg-[#20283e] text-white' : ''
             }`}
             onClick={() => setFilter('active')}
@@ -214,7 +222,7 @@ export default function App() {
             </em>
           </button>
           <button
-            className={`flex h-[42px] w-full items-center gap-[11px] rounded-[8px] px-[10px] text-left text-[14px] text-[#aeb4c8] hover:bg-[#1b2134] hover:text-[#e4e7f0] ${
+            className={`flex h-[42px] w-full items-center gap-[11px] whitespace-nowrap rounded-[8px] px-[10px] text-left text-[14px] text-[#aeb4c8] hover:bg-[#1b2134] hover:text-[#e4e7f0] ${
               filter === 'archived' ? 'bg-[#20283e] text-white' : ''
             }`}
             onClick={() => setFilter('archived')}
@@ -233,7 +241,7 @@ export default function App() {
           >
             <Menu size={21} />
           </button>
-          <div className="flex items-center gap-[9px] text-[13px] text-[#7d849b] max-[850px]:mr-auto max-[850px]:ml-[13px]">
+          <div className="flex items-center gap-[9px] whitespace-nowrap text-[13px] text-[#7d849b] max-[850px]:mr-auto max-[850px]:ml-[13px]">
             <span className="max-[560px]:hidden">链上记事本</span>
             <ChevronLeft className="max-[560px]:hidden" size={15} />
             <strong className="font-medium text-[#d9dce7]">
@@ -251,12 +259,12 @@ export default function App() {
               />
             </div>
             <button
-              className="m-0 flex h-[37px] items-center justify-center gap-[8px] rounded-[10px] bg-accent px-[14px] font-bold text-accent-fg transition-transform hover:-translate-y-px hover:bg-accent-hover max-[560px]:w-[39px] max-[560px]:px-0 max-[560px]:text-[0px]"
+              className="m-0 flex h-[37px] items-center justify-center gap-[8px] whitespace-nowrap rounded-[10px] bg-accent px-[14px] font-bold text-accent-fg transition-transform hover:-translate-y-px hover:bg-accent-hover max-[560px]:w-[39px] max-[560px]:px-0"
               onClick={() => openEditor()}
               disabled={!isConnected || !isContractConfigured}
             >
               <Plus size={18} />
-              新建
+              <span className="max-[560px]:hidden">新建</span>
             </button>
             <WalletMenuButton />
           </div>
@@ -302,7 +310,7 @@ export default function App() {
               </p>
               {!query && (
                 <button
-                  className="inline-flex items-center justify-center gap-[8px] rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
+                  className="inline-flex items-center justify-center gap-[8px] whitespace-nowrap rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
                   disabled={!isContractConfigured}
                   onClick={() => openEditor()}
                 >
@@ -375,7 +383,7 @@ export default function App() {
       {/* 交易状态浮条：发送中 / 确认中 / 已成功，点击可跳转区块浏览器查看详情 */}
       {hash && (
         <a
-          className="fixed right-[24px] bottom-[24px] z-[12] flex items-center gap-[8px] rounded-[10px] border border-accent/[0.22] bg-[#1d2b29] px-[16px] py-[13px] text-[13px] text-[#dfeacd] no-underline shadow-[0_15px_40px_rgba(0,0,0,0.35)] hover:bg-[#263832]"
+          className="fixed right-[24px] bottom-[24px] left-[24px] z-[12] flex items-center justify-center gap-[8px] whitespace-nowrap rounded-[10px] border border-accent/[0.22] bg-[#1d2b29] px-[16px] py-[13px] text-[13px] text-[#dfeacd] no-underline shadow-[0_15px_40px_rgba(0,0,0,0.35)] hover:bg-[#263832] sm:left-auto sm:justify-start"
           href={explorerUrl(hash)}
           target="_blank"
           rel="noreferrer"
@@ -414,7 +422,7 @@ function Welcome() {
       <ConnectButton.Custom>
         {({ openConnectModal }) => (
           <button
-            className="inline-flex items-center justify-center gap-[8px] rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
+            className="inline-flex items-center justify-center gap-[8px] whitespace-nowrap rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
             onClick={openConnectModal}
           >
             连接钱包 <ArrowUpRight size={17} />
@@ -494,7 +502,7 @@ function Editor({
   onSave: () => void
 }) {
   return (
-    <div className="fixed inset-0 z-[8] grid place-items-center bg-[#05070e]/[0.68] p-[25px] backdrop-blur-[8px] max-[560px]:p-[12px]">
+    <div className="fixed inset-0 z-[25] grid place-items-center bg-[#05070e]/[0.68] p-[25px] backdrop-blur-[8px] max-[560px]:p-[12px]">
       <section className="w-[min(100%,690px)] max-h-[calc(100vh-50px)] overflow-y-auto rounded-[18px] border border-white/10 bg-panel-3 p-[30px] shadow-[0_30px_90px_rgba(0,0,0,0.45)] max-[560px]:p-[23px]">
         <div className="flex items-start justify-between">
           <div>
@@ -538,7 +546,7 @@ function Editor({
           <span>{editor.content.length}/5000</span>
           {error && <span className="font-sans text-[#ff9f9f]">{error}</span>}
           <button
-            className="ml-auto inline-flex items-center justify-center gap-[8px] rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
+            className="ml-auto inline-flex items-center justify-center gap-[8px] whitespace-nowrap rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
             disabled={!editor.title.trim() || saving}
             onClick={onSave}
           >
@@ -575,7 +583,7 @@ function NoteDetail({
   saving: boolean
 }) {
   return (
-    <div className="fixed inset-0 z-[8] grid place-items-center bg-[#05070e]/[0.68] p-[25px] backdrop-blur-[8px] max-[560px]:p-[12px]">
+    <div className="fixed inset-0 z-[25] grid place-items-center bg-[#05070e]/[0.68] p-[25px] backdrop-blur-[8px] max-[560px]:p-[12px]">
       <article className="w-[min(100%,610px)] max-h-[calc(100vh-50px)] overflow-y-auto rounded-[18px] border border-white/10 bg-panel-3 p-[30px] shadow-[0_30px_90px_rgba(0,0,0,0.45)] max-[560px]:p-[23px]">
         <div className="flex items-start justify-between">
           <span className="font-mono text-[10px] tracking-[0.7px] text-[#8d96b5]">
@@ -608,9 +616,9 @@ function NoteDetail({
         <p className="my-[35px] min-h-[180px] whitespace-pre-wrap text-[15px] leading-[1.8] text-[#c4cada]">
           {note.content || '这篇笔记还没有正文。'}
         </p>
-        <div className="flex justify-end gap-[10px]">
+        <div className="flex flex-wrap justify-end gap-[10px]">
           <button
-            className="inline-flex items-center gap-[8px] rounded-[9px] bg-[#222a3e] px-[15px] py-[11px] text-[#b9c0d2]"
+            className="inline-flex items-center gap-[8px] whitespace-nowrap rounded-[9px] bg-[#222a3e] px-[15px] py-[11px] text-[#b9c0d2]"
             onClick={onArchive}
             disabled={saving}
           >
@@ -618,7 +626,7 @@ function NoteDetail({
             {note.archived ? '恢复笔记' : '归档笔记'}
           </button>
           <button
-            className="inline-flex items-center justify-center gap-[8px] rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
+            className="inline-flex items-center justify-center gap-[8px] whitespace-nowrap rounded-[9px] bg-accent px-[16px] py-[11px] text-[13px] font-bold text-[#152017] transition-transform hover:-translate-y-px hover:bg-accent-hover"
             onClick={onEdit}
           >
             <PenLine size={16} />
