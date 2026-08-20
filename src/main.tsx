@@ -25,6 +25,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={new QueryClient()}>
         <RainbowKitProvider
           avatar={NoteblockAvatar}
+          locale="zh-CN"
           theme={darkTheme({
             accentColor: '#d6ff7f',
             accentColorForeground: '#182215',
